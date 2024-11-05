@@ -8,4 +8,8 @@ class PieceWorker extends Employee {
         $this->itemsProduced = $itemsProduced;
         $this->wagePerItem = $wagePerItem;
     }
+
+    public function earnings() {
+        return $this->itemsProduced * $this->wagePerItem;
+    }
 }

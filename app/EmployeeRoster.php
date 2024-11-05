@@ -1,16 +1,23 @@
 <?php
 
 class EmployeeRoster {
-    private $roster = [];
+    private $employees = [];
     private $maxSize;
 
     public function __construct($maxSize) {
         $this->maxSize = $maxSize;
-        array_fill(0, $maxSize, null);
+        $this->employees = array_fill(0, $maxSize, null);
     }
 
     public function add(Employee $employee) {
+        for($i = 0; $i < $this->maxSize; $i++) {
+            if ($this->employees[$i] === null) {
+                $this->employees[$i] = $employee;
+                return true;
+            }
+        }
 
+        return false;
     }
 
     public function remove($employee_id) {
@@ -18,7 +25,14 @@ class EmployeeRoster {
     }
 
     public function count() {
+        $count = 0;
+        for($i = 0; $i < $this->maxSize; $i++) {
+            if($this->employees[$i] !== null) {
+                $count++;
+            }
+        }
 
+        return $count;
     }
 
     public function countCE() {

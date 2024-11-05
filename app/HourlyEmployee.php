@@ -8,4 +8,8 @@ class HourlyEmployee extends Employee {
         $this->hoursWorked = $hoursWorked;
         $this->hourlyRate = $hourlyRate;
     }
+
+    public function earnings() {
+        return $this->hoursWorked > 40 ? $this->hoursWorked * ($this->hourlyRate * 1.5) : $this->hoursWorked * $this->hourlyRate;
+    }
 }
