@@ -1,10 +1,12 @@
 <?php
 
-class EmployeeRoser {
+class EmployeeRoster {
     private $roster = [];
+    private $maxSize;
 
-    public function __construct($rosterSize) {
-        $this->roster = array_fill(0, $rosterSize, null);
+    public function __construct($maxSize) {
+        $this->maxSize = $maxSize;
+        array_fill(0, $maxSize, null);
     }
 
     public function add(Employee $employee) {
@@ -33,5 +35,9 @@ class EmployeeRoser {
 
     public function payroll() {
 
+    }
+
+    public function getSize() {
+        return $this->maxSize;
     }
 }
