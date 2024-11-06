@@ -10,6 +10,7 @@ class CommissionEmployee extends Employee {
         $this->regularSalary = $regularSalary;
         $this->itemSold = $itemSold;
         $this->commissionRate = $commissionRate;
+        $this->type = "Commissioned Employee";
 
     }
 

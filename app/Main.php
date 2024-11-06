@@ -8,7 +8,6 @@ class Main {
         $size = $this->askRosterSize();
         $this->roster = new EmployeeRoster($size);
         $this->mainMenu();
-        
     }
 
     private function playIntro() {
@@ -93,9 +92,12 @@ class Main {
             case 3:
                 $this->otherMenu();
                 break;
-            default:
+            case 0:
                 $this->printText("Shutting down...");
                 break;
+            default:
+                $this->printText("Invalid Input.");
+                $this->mainMenu();
         }
     }
 
@@ -169,23 +171,279 @@ class Main {
 
         $employee = new CommissionEmployee($regularSalary, $itemsSold, $commissionRate, $name, $address, $age, $company);
 
-        $this->roster->add($employee) && $this->printText("Employee added successfully", 1);
+        $this->roster->add($employee) && $this->printText("Employee added successfully\n", 1);
     }
 
     private function addHourlyEmployee($name, $address, $company, $age) {
+        $hoursWorked = (int) readline("Hours worked: ");
+        $hourlyRate = (int) readline("Hourly Rate (%): ");
 
+        $employee = new HourlyEmployee($hoursWorked, $hourlyRate, $name, $address, $age, $company);
+
+        $this->roster->add($employee) && $this->printText("Employee added successfully\n", 1);
     }
 
     private function addPieceWorker($name, $address, $company, $age) {
+        $itemsProduced = (int) readline("Number of items produced: ");
+        $wagePerItem = (int) readline("Wage per item: ");
 
+        $employee = new PieceWorker($itemsProduced, $wagePerItem, $name, $address, $age, $company);
+        $this->roster->add($employee) && $this->printText("Employee added successfully\n", 1);
     }
     
     private function deleteEmployee() {
-
+        
     }
 
     private function otherMenu() {
+        $choice;
+        do {
+            $this->clear();
+            $this->printText($this->generateTextBox(["Accessibilitty Menu"]));
+            $this->printText([
+                "[1] Display",
+                "[2] Count",
+                "[3] Payroll",
+                "[0] Return"
+            ], 1, 5);
+            
+            $choice = (int) readline("> ");
 
+            if($choice < 0 || $choice > 3) {
+                $this->printText("Invalid input. Please enter a number that corresponds to the menu", 2);
+                usleep(1000000);
+            }
+        } while($choice < 0 || $choice > 3);
+
+        switch($choice) {
+            case 1:
+                $this->displayMenu();
+                break;
+            case 2:
+                $this->countMenu();
+                break;
+            case 3:
+                $this->payroll();
+                break;
+            case 0:
+                $this->mainMenu();
+                break;
+            default:
+                $this->printText("Invalid Input.");
+                $this->otherMenu();
+        }
+    }
+
+    private function displayMenu() {
+        $choice;
+        do {
+            $this->clear();
+            $this->printText($this->generateTextBox("Display Employees"));
+            $this->printText([
+                "[1] Display All Employees",
+                "[2] Display Commissioned Employees",
+                "[3] Display Hourly Employees",
+                "[4] Display Piece Workers",
+                "[0] Return"
+            ], 1, 5);
+
+            $choice = (int) readline("> ");
+
+            if($choice < 0 || $choice > 4) {
+                $this->printText("Invalid input. Please enter a number that corresponds to the menu", 2);
+                usleep(1000000);
+            }
+        } while($choice < 0 || $choice > 4);
+
+        switch($choice) {
+            case 1:
+                $this->displayAllEmployees();
+                break;
+            case 2:
+                $this->displayCommissionedEmployees();
+                break;
+            case 3:
+                $this->displayHourlyEmployees();
+                break;
+            case 4:
+                $this->displayPieceWorkers();
+                break;
+            case 0:
+                $this->otherMenu();
+                break;
+        }
+    }
+
+    private function displayAllEmployees() {
+        $this->clear();
+        $this->printText($this->generateTextBox("All Employees"));
+        $employees = $this->roster->display();
+
+        $this->displayEmployees($employees);
+    }
+
+    private function displayCommissionedEmployees() {
+        $this->clear();
+        $this->printText($this->generateTextBox("Commissioned Employees"));
+        $employees = $this->roster->displayCE();
+
+        $this->displayEmployees($employees);
+    }
+
+    function displayHourlyEmployees() {
+        $this->clear();
+        $this->printText($this->generateTextBox("Hourly Employees"));
+        $employees = $this->roster->displayHE();
+
+        $this->displayEmployees($employees);
+    }
+
+    function displayPieceWorkers() {
+        $this->clear();
+        $this->printText($this->generateTextBox("Piece Workers"));
+        $employees = $this->roster->displayPW();
+
+        $this->displayEmployees($employees);
+    }
+
+    private function displayEmployees($employees) {
+        for($i = 0; $i < count($employees); $i++) {
+            $employee = $employees[$i];
+            $card = [];
+            array_push($card, "$i.");
+            array_push($card, "Name: $employee[0]");
+            array_push($card, "Address: $employee[1]");
+            array_push($card, "Age: $employee[2]");
+            array_push($card, "Company Name: $employee[3]");
+            array_push($card, "Type: $employee[4]");
+
+            $this->printText($this->generateLeftAlignedTextBox($card), 1, $i * 8 + 4);
+        }
+
+        readline("Press Enter to Continue...");
+        $this->displayMenu();
+    }
+
+    private function countMenu() {
+        $choice;
+        do {
+            $this->clear();
+            $this->printText($this->generateTextBox("Count Employees"));
+            $this->printText([
+                "[1] Count All Employees",
+                "[2] Count Commissioned Employees",
+                "[3] Count Hourly Employees",
+                "[4] Count Piece Workers",
+                "[0] Return"
+            ], 1, 5);
+
+            $choice = (int) readline("> ");
+
+            if($choice < 0 || $choice > 4) {
+                $this->printText("Invalid input. Please enter a number that corresponds to the menu", 2);
+                usleep(1000000);
+            }
+        } while($choice < 0 || $choice > 4);
+
+        switch($choice) {
+            case 1:
+                $this->countAllEmployees();
+                break;
+            case 2:
+                $this->countCommissionedEmployees();
+                break;
+            case 3:
+                $this->countHourlyEmployees();
+                break;
+            case 4:
+                $this->countPieceWorkers();
+                break;
+            case 0:
+                $this->displayMenu();
+                break;
+        }
+    }
+    
+    private function countAllEmployees() {
+        $this->clear();
+        $count = $this->roster->count();
+        $max = $this->roster->getSize();
+        $this->printText($this->generateTextBox([
+            "All Employees Listed",
+            "$count out of $max"
+        ]));
+
+        readline("Press Enter to Continue...");
+        $this->countMenu();
+    }
+
+    private function countCommissionedEmployees() {
+        $this->clear();
+        $count = $this->roster->countCE();
+        $max = $this->roster->getSize();
+        $this->printText($this->generateTextBox([
+            "Commissioned Employees Listed",
+            "$count out of $max"
+        ]));
+
+        readline("Press Enter to Continue...");
+        $this->countMenu();
+    }
+    
+    private function countHourlyEmployees() {
+        $this->clear();
+        $count = $this->roster->countHE();
+        $max = $this->roster->getSize();
+        $this->printText($this->generateTextBox([
+            "Hourly Employees Listed",
+            "$count out of $max"
+        ]));
+
+        readline("Press Enter to Continue...");
+        $this->countMenu();
+    }
+
+    private function countPieceWorkers() {
+        $this->clear();
+        $count = $this->roster->countPW();
+        $max = $this->roster->getSize();
+        $this->printText($this->generateTextBox([
+            "Piece Workers Listed",
+            "$count out of $max"
+        ]));
+
+        readline("Press Enter to Continue...");
+        $this->countMenu();
+    }
+    private function payroll() {
+
+    }
+
+    private function generateLeftAlignedTextBox($texts) {
+        if(gettype($texts) == "string") {
+            $texts = [$texts];
+        }
+
+        $box = [];
+        $maxTextSize = max(array_map('strlen', $texts));
+        $padding = 2;
+
+        for($i = 0; $i < count($texts) + 3; $i++) {
+            $current = $i == 0 ? '.' : '|';
+            $textSize = $i > 1 && $i < count($texts) + 2 ? strlen($texts[$i - 2]) : $maxTextSize;
+            
+            for($j = 0; $j < $maxTextSize + ($padding * 2); $j++) {
+                $current .= ($i == 0 || $i == 2 + count($texts)) ? '_' :
+                (($i == 1 || $j < $padding || $j >= $padding + $textSize) ? ' ' :
+                $texts[$i - 2][$j - $padding]);
+            }
+
+            $current .= $i == 0 ? ". " : "|";
+
+            array_push($box, $current);
+        }
+
+        return $box;
     }
 
     private function generateTextBox($texts) {
@@ -200,9 +458,13 @@ class Main {
         for($i = 0; $i < count($texts) + 3; $i++) {
             $current = $i == 0 ? '.' : '|';
             $textSize = $i > 1 && $i < count($texts) + 2 ? strlen($texts[$i - 2]) : $maxTextSize;
+            $isOdd = $maxTextSize - $textSize % 2 === 1;
             
             for($j = 0; $j < $maxTextSize + ($padding * 2); $j++) {
-                $current .= ($i == 0 || $i == 2 + count($texts)) ? '_' : (($i == 1 || $j < $padding + (($maxTextSize - $textSize) / 2) || $j >= $padding + $textSize + (($maxTextSize - $textSize) / 2)) ? ' ' : $texts[$i - 2][$j - $padding - (int)(($maxTextSize - $textSize) / 2)]);
+                $current .= ($i == 0 || $i == 2 + count($texts)) ? '_' : 
+                (($i == 1 || $j < $padding + (($maxTextSize - $textSize) / 2) ||
+                $j >= $padding + $textSize + (($maxTextSize - $textSize) / 2)) ? ' ' : 
+                $texts[$i - 2][$j - $padding - (int)((($maxTextSize - $textSize) + ($isOdd ? 0 : 1)) / 2 )]);
             }
                 
             $current .= $i == 0 ? ". " : "| ";
@@ -236,7 +498,7 @@ class Main {
         $delay = $duration / $totalCharacters;
         $output = array_fill(0, $rows, str_repeat('', $cols));
     
-        for ($d = 0; $d < $rows + ($cols * 3) - 1; $d++) {
+        for ($d = 0; $d < $rows + ($cols * 3); $d++) {
             for ($row = 0; $row <= $d; $row++) {
                 $col = $d - $row;
     
@@ -247,7 +509,7 @@ class Main {
 
             for ($i = 0; $i < $rows; $i++) {
                 echo "\033[" . ($startRow + $i + 1) . ";" . 1 . "H";
-                echo "\033[K"; // Clear line from cursor
+                echo "\033[K";
                 echo $output[$i];
             }
     
