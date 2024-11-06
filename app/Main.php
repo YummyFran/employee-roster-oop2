@@ -4,7 +4,7 @@ class Main {
     private EmployeeRoster $roster;
 
     public function main() {
-        $this->playIntro();
+        // $this->playIntro();  
         $size = $this->askRosterSize();
         $this->roster = new EmployeeRoster($size);
         $this->mainMenu();
@@ -68,7 +68,15 @@ class Main {
                 "[0] Exit"
             ], 1, 6);
             
-            $choice = (int) readline("> ");
+            $choice = $this->validateInput("> ");
+
+            if ($choice === "" || !is_numeric($choice)) {
+                $this->printText("Invalid input. Please enter a number between 0 and 3.", 2);
+                usleep(1000000);
+                continue;
+            }
+
+            $choice = (int) $choice;
 
             if($choice < 0 || $choice > 3) {
                 $this->printText("Invalid input. Please enter a number that corresponds to the menu", 2);
@@ -114,10 +122,10 @@ class Main {
         $this->printText($this->generateTextBox(["Add Employee Form", "Please fill up the required details"]));
 
         echo "\n";
-        $name = readline("Name: ");
-        $address = readline("Address: ");
-        $company = readline("Company Name: ");
-        $age = (int) readline("Age: ");
+        $name = $this->validateInput("Name: ");
+        $address = $this->validateInput("Address: ");
+        $company = $this->validateInput("Company Name: ");
+        $age = $this->validateInput("Age: ", "integer");
 
         $choice;
         do{
@@ -165,9 +173,9 @@ class Main {
     }
 
     private function addCommissionedEmployee($name, $address, $company, $age) {
-        $regularSalary = (float) readline("Regular salary: ");
-        $itemsSold = (int) readline("Number of sold items: ");
-        $commissionRate = (int) readline("Commission rate (%): ");
+        $regularSalary = $this->validateInput("Regular salary: ", "float");
+        $itemsSold = $this->validateInput("Number of sold items: ", "integer");
+        $commissionRate = $this->validateInput("Commission rate (%): ", "integer");
 
         $employee = new CommissionEmployee($regularSalary, $itemsSold, $commissionRate, $name, $address, $age, $company);
 
@@ -175,8 +183,8 @@ class Main {
     }
 
     private function addHourlyEmployee($name, $address, $company, $age) {
-        $hoursWorked = (int) readline("Hours worked: ");
-        $hourlyRate = (int) readline("Hourly Rate (%): ");
+        $hoursWorked = $this->validateInput("Hours worked: ", "integer");
+        $hourlyRate = $this->validateInput("Hourly Rate (%): ", "integer");
 
         $employee = new HourlyEmployee($hoursWorked, $hourlyRate, $name, $address, $age, $company);
 
@@ -184,15 +192,41 @@ class Main {
     }
 
     private function addPieceWorker($name, $address, $company, $age) {
-        $itemsProduced = (int) readline("Number of items produced: ");
-        $wagePerItem = (int) readline("Wage per item: ");
+        $itemsProduced = $this->validateInput("Number of items produced: ", "integer");
+        $wagePerItem = $this->validateInput("Wage per item: ", "integer");
 
         $employee = new PieceWorker($itemsProduced, $wagePerItem, $name, $address, $age, $company);
         $this->roster->add($employee) && $this->printText("Employee added successfully\n", 1);
     }
     
     private function deleteEmployee() {
+        $this->clear();
+        $this->printText($this->generateTextBox("Delete Employee"));
+        $employees = $this->roster->display();
+        $this->displayEmployees($employees, true);
         
+        if(count($employees) == 0) {
+            readline("Press Enter to Continue...");
+            $this->mainMenu();
+            return;
+        }
+
+        $this->printList($this->generateTextBox(["Enter Employee Number to Delete", "[0] Return"]));
+        $index = (int) readline("> ");
+
+        if($index == 0) {
+            $this->mainMenu();
+            return;
+        }
+
+        $this->clear();
+        $this->roster->remove($index - 1) ?
+        $this->printText($this->generateTextBox("Employee deleted successfully"), 1) :
+        $this->printText($this->generateTextBox("Employee not found"), 1);
+
+        sleep(1);
+        $this->deleteEmployee();
+
     }
 
     private function otherMenu() {
@@ -207,7 +241,15 @@ class Main {
                 "[0] Return"
             ], 1, 5);
             
-            $choice = (int) readline("> ");
+            $choice = $this->validateInput("> ");
+
+            if ($choice === "" || !is_numeric($choice)) {
+                $this->printText("Invalid input. Please enter a number between 0 and 3.", 2);
+                usleep(1000000);
+                continue;
+            }
+            
+            $choice = (int) $choice;
 
             if($choice < 0 || $choice > 3) {
                 $this->printText("Invalid input. Please enter a number that corresponds to the menu", 2);
@@ -247,7 +289,15 @@ class Main {
                 "[0] Return"
             ], 1, 5);
 
-            $choice = (int) readline("> ");
+            $choice = $this->validateInput("> ");
+
+            if ($choice === "" || !is_numeric($choice)) {
+                $this->printText("Invalid input. Please enter a number between 0 and 4.", 2);
+                usleep(1000000);
+                continue;
+            }
+            
+            $choice = (int) $choice;
 
             if($choice < 0 || $choice > 4) {
                 $this->printText("Invalid input. Please enter a number that corresponds to the menu", 2);
@@ -279,7 +329,10 @@ class Main {
         $this->printText($this->generateTextBox("All Employees"));
         $employees = $this->roster->display();
 
-        $this->displayEmployees($employees);
+        $this->displayEmployees($employees, true);
+
+        readline("Press Enter to Continue...");
+        $this->displayMenu();
     }
 
     private function displayCommissionedEmployees() {
@@ -288,6 +341,9 @@ class Main {
         $employees = $this->roster->displayCE();
 
         $this->displayEmployees($employees);
+
+        readline("Press Enter to Continue...");
+        $this->displayMenu();
     }
 
     function displayHourlyEmployees() {
@@ -296,6 +352,9 @@ class Main {
         $employees = $this->roster->displayHE();
 
         $this->displayEmployees($employees);
+
+        readline("Press Enter to Continue...");
+        $this->displayMenu();
     }
 
     function displayPieceWorkers() {
@@ -304,24 +363,32 @@ class Main {
         $employees = $this->roster->displayPW();
 
         $this->displayEmployees($employees);
+
+        readline("Press Enter to Continue...");
+        $this->displayMenu();
     }
 
-    private function displayEmployees($employees) {
+    private function displayEmployees($employees, $all = false) {
+        if(count($employees) == 0) {
+            $this->printText($this->generateTextBox("No Employees Found"), 1, 5);
+            return;
+        }
+
         for($i = 0; $i < count($employees); $i++) {
             $employee = $employees[$i];
             $card = [];
-            array_push($card, "$i.");
+
+            if($all)    array_push($card, "Employee #" . ($employee[5] + 1));   
+            else        array_push($card, $i + 1 . ".");
+
             array_push($card, "Name: $employee[0]");
             array_push($card, "Address: $employee[1]");
             array_push($card, "Age: $employee[2]");
             array_push($card, "Company Name: $employee[3]");
             array_push($card, "Type: $employee[4]");
 
-            $this->printText($this->generateLeftAlignedTextBox($card), 1, $i * 8 + 4);
+            $this->printList($this->generateLeftAlignedTextBox($card));
         }
-
-        readline("Press Enter to Continue...");
-        $this->displayMenu();
     }
 
     private function countMenu() {
@@ -337,7 +404,15 @@ class Main {
                 "[0] Return"
             ], 1, 5);
 
-            $choice = (int) readline("> ");
+            $choice = $this->validateInput("> ");
+
+            if ($choice === "" || !is_numeric($choice)) {
+                $this->printText("Invalid input. Please enter a number between 0 and 4.", 2);
+                usleep(1000000);
+                continue;
+            }
+            
+            $choice = (int) $choice;
 
             if($choice < 0 || $choice > 4) {
                 $this->printText("Invalid input. Please enter a number that corresponds to the menu", 2);
@@ -359,7 +434,7 @@ class Main {
                 $this->countPieceWorkers();
                 break;
             case 0:
-                $this->displayMenu();
+                $this->otherMenu();
                 break;
         }
     }
@@ -416,7 +491,12 @@ class Main {
         $this->countMenu();
     }
     private function payroll() {
+        $arr = [];
+        for($i = 0; $i < 200; $i++) {
+            array_push($arr, "h");
+        }
 
+        return $arr;
     }
 
     private function generateLeftAlignedTextBox($texts) {
@@ -475,6 +555,13 @@ class Main {
         return $box;
     }
 
+    private function printList($list) {
+        foreach($list as $item) {
+            echo $item . "\n";
+            usleep(40000);
+        }
+    }
+
     private function printText($text, $duration = 1, $startRow = 0) {
         if(gettype($text) == 'string') {
             $textLength = strlen($text);
@@ -526,5 +613,54 @@ class Main {
 
     private function clear() {
         echo chr(27).chr(91).'H'.chr(27).chr(91).'J'; 
+    }
+    
+    private function validateInput($label, $expectedType = "string") {
+        $input;
+        
+        if($expectedType == 'integer') {
+            do {
+                $input = (int) readline($label);
+
+                if($input <= 0) {
+                    $this->printText("Input must be an integer greater than 0.");
+                    usleep(500000);
+                    $this->clearLine();
+                    echo "\033[F";
+                    echo "\033[2K";
+                }
+            } while($input <= 0);
+        }
+
+        if($expectedType == "string") {
+            do {
+                $input = readline($label);
+
+                if($input == "") {
+                    $this->printText("Input cannot be empty.");
+                    usleep(500000);
+                    $this->clearLine();
+                    echo "\033[F";
+                    echo "\033[2K";
+                }
+            } while($input == "");
+        }
+
+        if($expectedType == "float") {
+            do {
+                $input = (float) readline($label);
+
+                if($input <= 0) {
+                    $this->printText("Input must be a float/integer greater than 0.");
+                    usleep(500000);
+                    $this->clearLine();
+                    echo "\033[F";
+                    echo "\033[2K";
+                }
+
+            } while($input <= 0);
+        }
+
+        return $input;
     }
 }

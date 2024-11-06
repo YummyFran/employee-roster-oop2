@@ -19,9 +19,9 @@
 //                     Number of Items Produced -> items
 //                     Wage per item -> wage
      
-     4.2 Delete Employee
-         Display All Employees
-         Select Employee to Delete
+//     4.2 Delete Employee
+//         Display All Employees
+//         Select Employee to Delete
  
 //     4.3 Other Menu
 //         4.3.1   Display

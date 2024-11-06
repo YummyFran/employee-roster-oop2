@@ -21,7 +21,10 @@ class EmployeeRoster {
     }
 
     public function remove($employee_id) {
-
+        if($employee_id < 0 || $employee_id >= $this->maxSize || $this->employees[$employee_id] == null) return false;
+        
+        $this->employees[$employee_id] = null;
+        return true;
     }
 
     public function count() {
@@ -79,7 +82,8 @@ class EmployeeRoster {
                     $employee["address"],
                     $employee["age"],
                     $employee["companyName"],
-                    $employee["type"]
+                    $employee["type"],
+                    $i
                 ]);
             }
         }
