@@ -4,7 +4,7 @@ class Main {
     private EmployeeRoster $roster;
 
     public function main() {
-        // $this->playIntro();  
+        $this->playIntro();  
         $size = $this->askRosterSize();
         $this->roster = new EmployeeRoster($size);
         $this->mainMenu();
@@ -70,7 +70,7 @@ class Main {
             
             $choice = $this->validateInput("> ");
 
-            if ($choice === "" || !is_numeric($choice)) {
+            if ($choice === "" || trim($choice) == "" || !is_numeric($choice)) {
                 $this->printText("Invalid input. Please enter a number between 0 and 3.", 2);
                 usleep(1000000);
                 continue;
@@ -175,7 +175,7 @@ class Main {
     private function addCommissionedEmployee($name, $address, $company, $age) {
         $regularSalary = $this->validateInput("Regular salary: ", "float");
         $itemsSold = $this->validateInput("Number of sold items: ", "integer");
-        $commissionRate = $this->validateInput("Commission rate (%): ", "integer");
+        $commissionRate = $this->validateInput("Commission rate per item: ", "integer");
 
         $employee = new CommissionEmployee($regularSalary, $itemsSold, $commissionRate, $name, $address, $age, $company);
 
@@ -184,7 +184,7 @@ class Main {
 
     private function addHourlyEmployee($name, $address, $company, $age) {
         $hoursWorked = $this->validateInput("Hours worked: ", "integer");
-        $hourlyRate = $this->validateInput("Hourly Rate (%): ", "integer");
+        $hourlyRate = $this->validateInput("Hourly Rate: ", "integer");
 
         $employee = new HourlyEmployee($hoursWorked, $hourlyRate, $name, $address, $age, $company);
 
@@ -243,7 +243,7 @@ class Main {
             
             $choice = $this->validateInput("> ");
 
-            if ($choice === "" || !is_numeric($choice)) {
+            if ($choice === "" || trim($choice) == "" || !is_numeric($choice)) {
                 $this->printText("Invalid input. Please enter a number between 0 and 3.", 2);
                 usleep(1000000);
                 continue;
@@ -291,7 +291,7 @@ class Main {
 
             $choice = $this->validateInput("> ");
 
-            if ($choice === "" || !is_numeric($choice)) {
+            if ($choice === "" || trim($choice) == "" || !is_numeric($choice)) {
                 $this->printText("Invalid input. Please enter a number between 0 and 4.", 2);
                 usleep(1000000);
                 continue;
@@ -406,7 +406,7 @@ class Main {
 
             $choice = $this->validateInput("> ");
 
-            if ($choice === "" || !is_numeric($choice)) {
+            if ($choice === "" || trim($choice) == "" || !is_numeric($choice)) {
                 $this->printText("Invalid input. Please enter a number between 0 and 4.", 2);
                 usleep(1000000);
                 continue;
@@ -490,13 +490,53 @@ class Main {
         readline("Press Enter to Continue...");
         $this->countMenu();
     }
+
     private function payroll() {
-        $arr = [];
-        for($i = 0; $i < 200; $i++) {
-            array_push($arr, "h");
+        $this->clear();
+        $this->printText($this->generateTextBox("Pay Roll"));
+        $employees = $this->roster->payroll();
+
+        if(count($employees) == 0) {
+            $this->printText($this->generateTextBox("No Employees Found"), 1, 5);
+            readline("Press Enter to Continue...");
+            $this->otherMenu();
+            return;
         }
 
-        return $arr;
+        for($i = 0; $i < count($employees); $i++) {
+            $employee = $employees[$i];
+            $card = [];
+
+            array_push($card, "Employee #" . ($employee[0] + 1));
+
+            array_push($card, "Name: $employee[1]");
+            array_push($card, "Address: $employee[2]");
+            array_push($card, "Age: $employee[3]");
+            array_push($card, "Company Name: $employee[4]");
+
+            if($employee[5] == "Commissioned Employee") {
+                array_push($card, "Regular Salary: $employee[7]"); 
+                array_push($card, "Items Sold: $employee[8]"); 
+                array_push($card, "Commission Rate: $employee[9]"); 
+            }
+
+            if($employee[5] == "Hourly Employee") {
+                array_push($card, "Hours Worked: $employee[7]");    
+                array_push($card, "Hourly Rate: $employee[8]");
+            }
+
+            if($employee[5] == "Piece Worker") {
+                array_push($card, "Items Produced: $employee[7]");    
+                array_push($card, "Wage Per Item: $employee[8]");
+            }
+
+            array_push($card, "Earnings: $employee[6]");
+
+            $this->printList($this->generateLeftAlignedTextBox($card));
+        }
+
+        readline("Press Enter to Continue...");
+        $this->otherMenu();
     }
 
     private function generateLeftAlignedTextBox($texts) {
@@ -636,7 +676,7 @@ class Main {
             do {
                 $input = readline($label);
 
-                if($input == "") {
+                if($input == "" || trim($input) == "") {
                     $this->printText("Input cannot be empty.");
                     usleep(500000);
                     $this->clearLine();

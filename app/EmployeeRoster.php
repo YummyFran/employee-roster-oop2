@@ -149,7 +149,44 @@ class EmployeeRoster {
     }
 
     public function payroll() {
+        $allEmployees = [];
 
+        for($i = 0; $i < $this->maxSize; $i++) {
+            if ($this->employees[$i] !== null) {
+                $employee = $this->employees[$i]->getInfos();
+                $determinants = $this->employees[$i]->getDeterminants();
+
+                $data = [
+                    $i,
+                    $employee["name"],
+                    $employee["address"],
+                    $employee["age"],
+                    $employee["companyName"],
+                    $employee["type"],
+                    $this->employees[$i]->earnings()
+                ];
+
+                if($employee["type"] == "Commissioned Employee") {
+                    array_push($data, $determinants["regularSalary"]);
+                    array_push($data, $determinants["itemSold"]);
+                    array_push($data, $determinants["commissionRate"]);
+                }
+
+                if($employee["type"] == "Hourly Employee") {
+                    array_push($data, $determinants["hoursWorked"]);
+                    array_push($data, $determinants["hourlyRate"]);
+                }
+
+                if($employee["type"] == "Piece Worker") {
+                    array_push($data, $determinants["itemsProduced"]);
+                    array_push($data, $determinants["wagePerItem"]);
+                }
+                
+                array_push($allEmployees, $data);
+            }
+        }
+
+        return $allEmployees;
     }
 
     public function getSize() {

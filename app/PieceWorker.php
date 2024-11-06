@@ -11,6 +11,13 @@ class PieceWorker extends Employee {
         $this->type = "Piece Worker";
     }
 
+    public function getDeterminants() {
+        return array(
+            "itemsProduced" => $this->itemsProduced,
+            "wagePerItem" => $this->wagePerItem
+        );
+    }
+
     public function earnings() {
         return $this->itemsProduced * $this->wagePerItem;
     }

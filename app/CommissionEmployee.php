@@ -11,14 +11,17 @@ class CommissionEmployee extends Employee {
         $this->itemSold = $itemSold;
         $this->commissionRate = $commissionRate;
         $this->type = "Commissioned Employee";
+    }
 
+    public function getDeterminants() {
+        return array(
+            "regularSalary" => $this->regularSalary,
+            "itemSold" => $this->itemSold,
+            "commissionRate" => $this->commissionRate
+        );
     }
 
     public function earnings() {
-        return $regularSalary + ($itemSold * $commissionRate);
-    }
-
-    public function getName() {
-        return $this->name;
+        return $this->regularSalary + ($this->itemSold * $this->commissionRate);
     }
 }

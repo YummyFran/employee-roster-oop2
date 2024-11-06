@@ -34,20 +34,22 @@
 //             4.3.2.2 Count Commissioned Employees
 //             4.3.2.3 Count Hourly Employees
 //             4.3.2.4 Count Piece Workers
-         4.3.3   Payroll
-             Name
-             Address
-             Age
-             Company
-                 4.3.3.1 Commissioned Employees
-                     Items Sold
-                     Commission Rate
-                     Earnings
-                 4.3.3.2 Hourly Employees
-                     Hours Worked
-                     Hourly Rate
-                     Earnings
-                 4.3.3.3 Piece Workers
-                     Items Produced
-                     Wage per item
-                     Earnings
+//         4.3.3   Payroll
+//             Name
+//             Address
+//             Age
+//             Company
+//                 4.3.3.1 Commissioned Employees
+//                     Items Sold
+//                     Commission Rate
+//                     Earnings
+//                 4.3.3.2 Hourly Employees
+//                     Hours Worked
+//                     Hourly Rate
+//                     Earnings
+//                 4.3.3.3 Piece Workers
+//                     Items Produced
+//                     Wage per item
+//                     Earnings
+
+[ Completed ]
